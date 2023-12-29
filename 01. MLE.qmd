@@ -1,0 +1,102 @@
+---
+title: "Metoda największej wiarygodności (MLE)"
+author: "Paweł Wieczyński"
+format: html
+editor: visual
+---
+
+```{r}
+if(!require('pacman')) install.packages('pacman')
+pacman::p_load(tidyverse)
+theme_set(theme_bw())
+options(scipen = 99)
+```
+
+## Wstęp
+
+$\mathbf{X} = (X_1, \dots, X_d) \in \mathbb{R}^d$ - wektor losowy zmiennych objaśniających / predyktorów
+
+$Y \in \mathbb{R}$ - zmienna losowa będąca zmienną objaśnianą / zmienną celu
+
+Dysponujemy $n$-elementową próbą losową (tzn. konkretnymi realizacjami powyższych zmiennych losowych):
+
+$$
+\lbrace (\mathbf{x}_1, y_1), \dots, (\mathbf{x}_n, y_n)
+$$
+
+gdzie $\mathbf{x}_i = (x_{1i}, \dots, x_{di})$ .
+
+Szukamy warunkową wartość oczekiwaną
+
+$$
+\mathbb{E} \left[Y \ | \ X = \mathbf{x} \right]
+$$
+
+Zakładamy, że dane pochodzą z rodziny rozkładów parametryzowanych wektorem $\theta \in \Theta$. **Funkcję wiarygodności** definiujemy następująco:
+
+$$
+\mathcal{L}_n (\theta \ | \ \mathbf{x}) = \prod_{i=1}^n f (\mathbf{x}_i \ | \ \theta)
+$$
+
+gdzie $f (. \ | \ \theta)$ jest funkcją masy prawdopodobieństwa (dla rozkładów dyskretnych) lub funkcją gęstości prawdopodobieństwa (dla rozkładów ciągłych).
+
+TBD: interpretacja
+
+Naszym celem jest maksymalizacja funkcji wiarygodności, tzn. szukamy:
+
+$$ \hat{\theta} = \arg\!\max_{\theta \in \Theta} \mathcal{L} (\theta \ | \ \mathbf{x}) $$ rozwiązując równanie wiarygodności:
+
+$$
+\frac{\partial \mathcal{L} (\theta \ | \ \mathbf{x})}{\partial \theta} = 0
+$$
+
+TBD: why log
+
+Łatwiej jest optymalizować logarytm funkcji wiarygodności:
+
+$$
+l_n (\theta \ | \ \mathbf{x}) = -\mathcal{L}_n (\theta \ | \ \mathbf{x}) \longrightarrow \min
+$$
+
+## Przykład: ilość orłów w serii rzutów monetą
+
+Rzucamy $n$ razy monetą, prawdopodobieństwo wyrzucenia orław pojedynczym rzucie wynosi $\theta$, a reszki $1-\theta$. Dysponujemy próbą losową $x_1, \dots, x_n$, w której wyrzucono $k$ orłów. Funkcja wiarygodności ma postać:
+
+$$
+\mathcal{L}_n (\theta \ | \ \mathbf{k}) = {N \choose k} \theta^k (1-\theta)^{n-k}
+$$
+
+```{r}
+n = 20
+set.seed(234)
+coins = rbinom(n, 1, 0.5)
+table(coins)
+k = sum(coins == 1)
+```
+
+```{r}
+likelihood = tibble(
+  p = seq(0, 1, by = 0.001)
+  , l = p^k * (1-p)^(n-k)
+)
+
+max_l = likelihood %>%
+  filter(l == max(l)) %>%
+  pull(p)
+
+max_l
+
+ggplot(likelihood, aes(x = p, y = l)) + 
+  geom_line() +
+  geom_vline(
+    xintercept = max_l
+    , linewidth = 1
+    , linetype = 'dashed'
+  )
+```
+
+## Przykład: rozkład normalny
+
+### Literatura:
+
+-   Zieliński R., *Siedem wykładów wprowadzających do statystyki matematycznej*, Warszawa 2004, *Wykład V. Wiarogodność*
