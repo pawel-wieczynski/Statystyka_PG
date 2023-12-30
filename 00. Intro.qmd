@@ -1,0 +1,71 @@
+---
+title: "Wprowadzenie do metod uczenia maszynowego"
+author: "Paweł Wieczyński"
+format: html
+editor: visual
+---
+
+```{r}
+if(!require('pacman')) install.packages('pacman')
+pacman::p_load(tidyverse)
+theme_set(theme_bw())
+options(scipen = 99)
+```
+
+## Wstęp
+
+### Oznaczenia
+
+-   $X = (X_1, \dots, X_d) \in \mathbb{R}^d$ - wektor losowy zmiennych objaśniających / predyktorów
+
+-   $Y \in \mathbb{R}$ - zmienna losowa będąca zmienną objaśnianą / zmienną celu
+
+-   $\mathbb{P} (\mathbf{X}, Y)$ - łączny rozkład prawdopodobieństwa
+
+-   Szukamy funkcję $f(X) \simeq Y$
+
+-   $L_f = L(Y, f(X))$ - funkcja straty oceniająca jak dobrze $f(X)$ przybliża $Y$
+
+-   $\mathcal{D} = \lbrace (\mathbf{x}_i , y_i) \rbrace_{i=1}^n$ - realizacje powyższych zmiennych losowych, dane treningowe / próbka losowa, którą dysponujemy
+
+### Terminologia
+
+-   uczenie nadzorowane
+
+-   uczenie nienadzorowane
+
+-   uczenie ze wzmocnieniem
+
+## Statystyczna teoria decyzji
+
+Przyjmijmy kwadratową funkcję straty:
+
+$$
+L_f = (Y - f(X))^2
+$$
+
+Naszym celem jest minimalizacja jej wartości oczekiwanej
+
+$$
+\mathbb{E} (L_f) =  \mathbb{E} (Y - f(X))^2 = \int (y-f(x))^2 \ \mathbb{P} (dx, dy) \longrightarrow \min
+$$
+
+Korzystając z własności wartości oczekiwanej (*law of total expectations*) mamy:
+
+$$
+\mathbb{E} (L_f) =  \mathbb{E} (Y - f(X))^2 = \mathbb{E} ( \mathbb{E} (Y - f(X))^2 \ | \ X)
+$$
+
+Dla konkretnej realizacji $x$ zmiennej losowej $X$ chcemy znaleźć wartość $f(x) = c$, która zminimalizuje oczekiwany błąd $\mathbb{E}( (Y - c)^2) \ | \ X = x)$. W tym wypadku rozwiązaniem jest warunkowa wartość oczekiwana
+
+$$
+f(x) = \mathbb{E} (Y \ | \ X = x)
+$$
+
+### **Redukowalny i nieredukowalny błąd estymacji**
+
+### **Dekompozycja bias-variance**
+
+### **Overfitting i underfitting**
+
+## Walidacja krzyżowa
