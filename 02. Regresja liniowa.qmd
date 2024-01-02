@@ -1,0 +1,90 @@
+---
+title: "Regresja liniowa"
+author: "Paweł Wieczyński"
+format: html
+editor: visual
+---
+
+```{r}
+if(!require('pacman')) install.packages('pacman')
+pacman::p_load(tidyverse)
+theme_set(theme_bw())
+options(scipen = 99)
+```
+
+## Metoda najmniejszych kwadratów
+
+Poniższy zbiór danych zwiera $n = 12$ realizacji wektora losowego $(X, Y)$, gdzie:
+
+-   $Y$ oznacza wzrost dzieci w cm
+
+-   $X$ oznacza wiek dzieci w miesiącach.
+
+Zakładamy, że istnieje funkcja $f$ taka, że $Y = f(X) + \epsilon$, a naszym celem jest znalezienie funkcji $\hat{f}$, która przybliża funkcję $f$ w pewien ***optymalny*** sposób.
+
+```{r}
+df = read.csv('datasets\\age_height.csv')
+ggplot(df, aes(x = age, y = height)) + geom_point()
+```
+
+W modelu regresji liniowej zakładamy, że istnieją stałe parametry $\beta_0, \beta_1 \in \mathbb{R}$, takie że $Y = \beta_0 + \beta_1 X + \epsilon$. Musimy zatem znaleźć $\hat{\beta_0}, \hat{\beta_0}$.
+
+```{r}
+#tbd wykres z kilkoma przykladami beta0 oraz beta1 i liniami przerywanymi z residualsami
+```
+
+### $d>1$ zmiennych objaśniających
+
+W ogólnym przypadku, gdy mamy $n$ obserwacji oraz $d$ zmiennych objaśniających, model regresji liniowej ma postać:
+
+$$
+Y = \beta_0 + \sum_{i=1}^d \beta_i X + \epsilon
+$$
+
+Szukamy wektor $d+1$ parametrów $\hat{\beta} = \left[ \hat{\beta_0}, \hat{\beta_1}, \dots, \hat{\beta_p} \right] \in \mathbb{R}^{d+1}$, takich, że
+
+$$
+\frac{1}{n} \sum_{i=1}^n \left[ \sum_{j=0}^d \left( \beta_j x_{ij} - y_i \right) \right]^2 \longrightarrow \min
+$$
+
+### Zapis macierzowy
+
+W tym wypadku (i w wielu innych) warto zastosować zapis macierzowy. W tym wypadku mamy następujące macierze/wektory:
+
+-   $\mathbf{X}$ - macierz danych wejściowych wymiaru $n \times (d+1)$; pierwsza kolumna tej macierzy zawiera same jedynki i będzie potrzebna do oszacowania parametru $\beta_0$
+
+-   $\mathbf{y}$ - wektor danych wyjściowych wymiaru $n \times 1$
+
+-   $\hat{\beta}$ - wektor szukanych parametrów wymiaru $(d+1) \times 1$
+
+-   oraz funkcję straty, którą chcemy minimalizaować:
+
+    $$
+    L\left( \hat{\beta} \right) = \frac{1}{n} \left| \left| \ \mathbf{X} \hat{\beta} - \mathbf{y} \  \right| \right|^2 \longrightarrow \min
+    $$
+
+Liczymy gradient funkcji straty i przyrównujemy go do zera:
+
+$$
+\nabla L\left( \hat{\beta} \right) = \frac{2}{n} \mathbf{X}^\intercal \left( \mathbf{X} \hat{\beta} - \mathbf{y} \right) = 0
+$$
+
+Wymnażamy nawias i przenosimy na drugą stronę (*ćw. sprawdzić czy wymiary się zgadzają*):
+
+$$
+\mathbf{X}^\intercal \mathbf{X} \hat{\beta} = \mathbf{X}^\intercal \mathbf{y}
+$$
+
+Rozwiązujemy równanie macierzowe względem wektora $\hat{\beta}$:
+
+$$
+\hat{\beta} = \left( \mathbf{X}^\intercal \mathbf{X} \right)^{-1} \mathbf{X}^\intercal \mathbf{y} = \mathbf{X}^\dagger \mathbf{y}
+$$
+
+Macierz $\mathbf{X}^\dagger$ nazywamy **macierzą pseudoodwrotną** macierzy $\mathbf{X}$.
+
+W tej procedurze najbardziej złożonym krokiem jest odwrócenie macierzy $\mathbf{X}^\intercal \mathbf{X}$. W praktyce przyjmujemy, że:
+
+-   im mniej zmiennych objaśniających $d$, tym łatwiej odwrócić macierz
+
+-   jeśli ilość obserwacji $n$ jest wystarcająco duża, to $\mathbb{P} \left[ \ \mathbf{X}^\intercal \mathbf{X} \quad \text{jest odwracalna} \ \right] \simeq 1$.
