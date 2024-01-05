@@ -88,3 +88,27 @@ W tej procedurze najbardziej złożonym krokiem jest odwrócenie macierzy $\math
 -   im mniej zmiennych objaśniających $d$, tym łatwiej odwrócić macierz
 
 -   jeśli ilość obserwacji $n$ jest wystarcająco duża, to $\mathbb{P} \left[ \ \mathbf{X}^\intercal \mathbf{X} \quad \text{jest odwracalna} \ \right] \simeq 1$.
+
+### Przykład
+
+```{r}
+X = cbind(1, df$age)
+y = df$height
+
+X_pseudo_inverse = solve( t(X) %*% X ) %*% t(X)
+beta = X_pseudo_inverse %*% y
+beta
+```
+
+W języku R mamy gotowe polecenie `lm`:
+
+```{r}
+model = lm(height ~ age, data = df)
+summary(model)
+```
+
+```{r}
+ggplot(df, aes(x = age, y = height)) +
+  geom_point() +
+  geom_smooth(method = 'lm')
+```
