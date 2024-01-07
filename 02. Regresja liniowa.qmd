@@ -112,3 +112,53 @@ ggplot(df, aes(x = age, y = height)) +
   geom_point() +
   geom_smooth(method = 'lm')
 ```
+
+## Metoda największej wiarygodności
+
+Musimy poczynić pewne założenia na temat rozkładów. Załóżmy, że błędy losowe są niezależne oraz mają rozkład warunkowo normalny (TBD):
+
+$$
+\epsilon \ | \ X \overset{\text{iid}}{\sim} \mathcal{N} (0, \sigma^2_{\epsilon})
+$$
+
+Dla danej realizacji $\mathcal{D} = \lbrace (\mathbf{x}_i, y_i )\rbrace_{i=1}^n$ funkcja wiarygodności przyjmuje postać
+
+$$
+\mathcal{L}_n (\beta, \sigma^2 \ | \ \mathcal{D}) = 
+\prod_{i=1}^n f_Y (y_i | \mathbf{x}_i) =  \\
+= \prod_{i=1}^n \frac{1}{\sqrt{2\pi \sigma^2}} \exp \left( -\frac{1}{2} \frac{ \left( y_i - x_i \beta \right)^2}{\sigma^2} \right) = \\
+= \frac{1}{\left( \sqrt{2\pi \sigma^2} \right)^n } \exp \left( -\frac{1}{2\sigma^2} \sum_{i=1}^n \left( y_i - x_i \beta \right)^2 \right)
+$$
+
+Logarytm funkcji wiarygodności przyjmuje wówczas postać
+
+$$
+l_n (\beta, \sigma^2 \ | \ \mathcal{D}) = \ln ( \mathcal{L}_n (\beta, \sigma^2 \ | \ \mathcal{D})) = \\
+= \ln \left( \frac{1}{\left( \sqrt{2\pi \sigma^2} \right)^n }  \right) + \ln \left( \exp \left( -\frac{1}{2\sigma^2} \sum_{i=1}^n \left( y_i - x_i \beta \right)^2 \right) \right) = \\
+= -\frac{n}{2} \ln \left( 2\pi \right) - \frac{n}{2} \ln \left( \sigma^2 \right) - \frac{1}{2\sigma^2} \sum_{i=1}^m \left( y_i - x_i\beta \right)^2
+$$
+
+Chcemy wyznaczyć parametry $\hat{\beta}$ oraz $\hat{\sigma}$, aby zmaksymalizowac logarytm wiarygodności. Liczymy zatem odpowiednie gradienty
+
+$$
+\nabla_{\beta} \ l_n (\beta, \sigma^2 \ | \ \mathcal{D}) = \frac{1}{\sigma^2} \sum_{i=1}^n \mathbf{x}_i^\intercal \left( y_i - \mathbf{x}_i \beta \right) = 
+\frac{1}{\sigma^2} \left( \sum_{i=1}^n \mathbf{x}_i^\intercal y_i - \sum_{i=1}^n \mathbf{x}_i^\intercal \mathbf{x}_i \beta \right)
+$$
+
+$$
+\frac{\partial }{\partial \sigma^2} l_n (\beta, \sigma^2 \ | \ \mathcal{D}) = 
+-\frac{n}{2\sigma^2} - \left( \frac{1}{2} \sum_{i=1}^n \left( y_i - \mathbf{x}_i \beta \right)^2  \right) \frac{1}{\left( \sigma^2 \right)^2} = \\
+= \frac{1}{2\sigma^2} \left( \frac{1}{\sigma^2} \sum_{i=1}^n \left( y_i - \mathbf{x}_i \beta \right)^2 - n \right)
+$$
+
+Przyrównując je do zera otrzymujemy
+
+$$
+\hat{\beta} = \left( \sum_{i=1}^n \mathbf{x}_i^\intercal \mathbf{x}_i \right)^{-1} \sum_{i=1}^n \mathbf{x}_i^\intercal y_i = \left( \mathbf{X}^\intercal \mathbf{X} \right)^{-1} \mathbf{X}^\intercal y = \mathbf{X}^\dagger y
+$$
+
+$$
+\hat{\sigma}^2 = \frac{1}{n} \sum_{i=1}^m \left( y_i - \mathbf{x}_i \hat{\beta} \right)^2
+$$
+
+Widzimy zatem, że w przypadku regresji liniowej współczynniki $\hat{\beta}$ otrzymane za pomocą metody największej wiarygodności są takie same jak współczynniki otrzymane za pomoca metody najmniejszych kwadratów.
